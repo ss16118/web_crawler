@@ -8,7 +8,7 @@ DEFAULT_DOWNLOAD_DIR = "pages/"
 DEFAULT_LOG_FILE_DIR = "log/"
 DEFAULT_LOG_FILE = "output.log"
 DEFAULT_RESULT_FILE = "result.out"
-MIN_PROCESS_TIME = 5
+MIN_PROCESS_TIME = 3
 
 class WebCrawlerManager:
     def __init__(self, starting_url, maximum_urls, maximum_threads, folder, log, verbose):
@@ -108,7 +108,15 @@ class WebCrawlerManager:
         # make sure the process quits before the queue is empty.
         while (len(self.crawled) < self.maximum_urls
                and len(self.queue.queue) > 0) or time.time() - self.start_time < MIN_PROCESS_TIME:
-            pass
+            # Displays a progress bar if not verbose
+            crawled_count = len(self.crawled)
+            if not self.verbose:
+                sys.stdout.write('\r')
+                percentage_finished = crawled_count / self.maximum_urls
+                sys.stdout.write("[%-40s] %d%% | %d/%d" %
+                                 ('=' * int(percentage_finished * 40),
+                                  100 * percentage_finished, crawled_count, self.maximum_urls))
+                sys.stdout.flush()
         self.end_time = time.time()
 
         message = "Crawling terminated!"
@@ -156,7 +164,7 @@ class WebCrawlerManager:
     Outputs the statistics collected during the crawl
     """
     def print_statistics(self):
-        print("======== Statistics ========")
+        print("\n======== Statistics ========")
         print("Number of threads: {}".format(self.maximum_threads))
         print("Number of unique links crawled: {}".format(len(self.crawled)))
         print("Number of unique links discovered: {}".format(self.discovered_urls))

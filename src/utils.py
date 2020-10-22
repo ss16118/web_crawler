@@ -25,13 +25,14 @@ def get_arguments(argv):
     -t: maximum number of threads to use <Default: 8>
     -v: whether to output all messages in console during crawling <Default: False>
     -l: whether logging is enabled <Default: False>
-    -f: folder to store output files <Default: domain name of the url>"""
+    -f: folder to store output files 
+    <Default: one level above the current directory with domain name of the url as the folder name>"""
 
     if len(argv) == 0:
         print(help_message)
         sys.exit(2)
     try:
-        opts, args = getopt.getopt(argv, "hu:n:t:vlf:")
+        opts, args = getopt.getopt(argv, "hu:n:t:f:vl")
     except getopt.GetoptError:
         print(help_message)
         sys.exit(2)
@@ -58,6 +59,7 @@ def get_arguments(argv):
     folder = os.path.join(os.pardir, urlparse(starting_url, "https").hostname) if folder is None else folder
     return starting_url, maximum_urls, maximum_threads, verbose, log, folder
 
+
 """
 Retrieves the content of a url and return a string
 """
@@ -72,6 +74,7 @@ def retrieve_html_from_url(url):
         raise Exception("HTTP response does not contain 'Content-Type' header")
     except Exception as ex:
         raise ex
+
 
 """
 Essentially an HTML parser to parse the page content and retrieve the 
